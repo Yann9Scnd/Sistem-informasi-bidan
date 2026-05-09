@@ -13,23 +13,30 @@ class PemeriksaanFisik extends Model
 
     protected $fillable = [
         'pasien_id',
-        'tekanan_darah_sistolik',
-        'tekanan_darah_diastolik',
+        'kesadaran',
+        'td_sistolik',
+        'td_diastolik',
         'nadi',
         'suhu',
-        'pernapasan',
-        'berat_badan',
+        'nafas_rr',
         'tinggi_badan',
+        'berat_badan',
+        'lingkar_lengan',
         'lingkar_perut',
-        'tinggi_fundus',
-        'denyut_jantung_janin',
-        'presentasi_janin',
-        'catatan_fisik',
+        'anc_terpadu',
     ];
 
     public function pasien()
     {
         return $this->belongsTo(Pasien::class);
+    }
+
+    /**
+     * Tekanan darah format "120/80 mmHg".
+     */
+    public function getTekananDarahAttribute(): string
+    {
+        return $this->td_sistolik . '/' . $this->td_diastolik . ' mmHg';
     }
 
     /**
@@ -42,13 +49,5 @@ class PemeriksaanFisik extends Model
             return round($this->berat_badan / ($tinggiM * $tinggiM), 1);
         }
         return null;
-    }
-
-    /**
-     * Tekanan darah format "120/80".
-     */
-    public function getTekananDarahAttribute(): string
-    {
-        return $this->tekanan_darah_sistolik . '/' . $this->tekanan_darah_diastolik;
     }
 }

@@ -167,8 +167,8 @@
     <div class="brand-logo">
       <div class="logo-icon">🏥</div>
       <div>
-        <div class="brand-name">PMB Bidan Klinik</div>
-        <div class="brand-sub">Sistem Manajemen Pasien</div>
+        <div class="brand-name">PMB Sri Andayani</div>
+        <div class="brand-sub">Amd.Keb — Sistem Informasi Klinik Bidan</div>
       </div>
     </div>
 
@@ -303,8 +303,8 @@
       <text x="30" y="155" font-size="10" fill="rgba(255,255,255,0.4)">✦</text>
     </svg>
 
-    <div class="illustration-title">Sistem Klinik Bidan</div>
-    <div class="illustration-desc">Membantu pencatatan pasien dengan cepat, akurat, dan efisien untuk pelayanan terbaik</div>
+    <div class="illustration-title">PMB Sri Andayani, Amd.Keb</div>
+    <div class="illustration-desc">Sistem informasi klinik bidan untuk pencatatan pasien yang cepat, akurat, dan efisien</div>
 
     <div class="floating-badge badge-2">
       <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>

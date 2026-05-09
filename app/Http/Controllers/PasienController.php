@@ -16,12 +16,12 @@ class PasienController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('nama', 'like', "%{$search}%")
                   ->orWhere('nik', 'like', "%{$search}%")
-                  ->orWhere('no_hp', 'like', "%{$search}%");
+                  ->orWhere('no_telp', 'like', "%{$search}%");
             });
         }
 
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
+        if ($request->filled('poli')) {
+            $query->where('poli', $request->poli);
         }
 
         $pasien = $query->latest()->paginate(10)->withQueryString();
@@ -31,29 +31,34 @@ class PasienController extends Controller
 
     public function create()
     {
-        return view('pasien.create');
+        $noUrut = Pasien::generateNoUrut();
+        return view('pasien.create', compact('noUrut'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nik'              => ['required', 'string', 'size:16', 'unique:pasien,nik'],
-            'nama'             => ['required', 'string', 'max:100'],
-            'jenis_kelamin'    => ['required', 'in:Laki-laki,Perempuan'],
-            'tanggal_lahir'    => ['required', 'date', 'before:today'],
-            'no_hp'            => ['required', 'string', 'max:15'],
-            'alamat_tinggal'   => ['required', 'string'],
-            'alamat_ktp'       => ['nullable', 'string'],
-            'golongan_darah'   => ['nullable', 'in:A,B,AB,O'],
-            'agama'            => ['nullable', 'string', 'max:20'],
-            'pekerjaan'        => ['nullable', 'string', 'max:50'],
-            'status'           => ['required', 'in:Aktif,Tidak Aktif'],
+            'nik'            => ['required', 'string', 'size:16', 'unique:pasien,nik'],
+            'nama'           => ['required', 'string', 'max:100'],
+            'jenis_kelamin'  => ['required', 'in:Laki-laki,Perempuan'],
+            'tempat_lahir'   => ['nullable', 'string', 'max:100'],
+            'tanggal_lahir'  => ['required', 'date', 'before:today'],
+            'alamat'         => ['required', 'string'],
+            'nama_ortu'      => ['nullable', 'string', 'max:100'],
+            'no_telp'        => ['required', 'string', 'max:15'],
+            'poli'           => ['required', 'in:KIA,KB,MTBS'],
         ], [
             'nik.required'   => 'NIK wajib diisi.',
             'nik.size'       => 'NIK harus 16 digit.',
             'nik.unique'     => 'NIK sudah terdaftar.',
             'nama.required'  => 'Nama pasien wajib diisi.',
+            'tanggal_lahir.required' => 'Tanggal lahir wajib diisi.',
+            'alamat.required' => 'Alamat wajib diisi.',
+            'no_telp.required' => 'Nomor telepon wajib diisi.',
+            'poli.required'  => 'Poli tujuan wajib dipilih.',
         ]);
+
+        $validated['no_urut'] = Pasien::generateNoUrut();
 
         Pasien::create($validated);
 
@@ -63,7 +68,7 @@ class PasienController extends Controller
 
     public function show(Pasien $pasien)
     {
-        $pasien->load(['anamnesa', 'pemeriksaanFisik', 'pemeriksaanLainnya']);
+        $pasien->load(['anamnesa', 'pemeriksaanFisik', 'diagnosis']);
         return view('pasien.show', compact('pasien'));
     }
 
@@ -75,17 +80,15 @@ class PasienController extends Controller
     public function update(Request $request, Pasien $pasien)
     {
         $validated = $request->validate([
-            'nik'              => ['required', 'string', 'size:16', "unique:pasien,nik,{$pasien->id}"],
-            'nama'             => ['required', 'string', 'max:100'],
-            'jenis_kelamin'    => ['required', 'in:Laki-laki,Perempuan'],
-            'tanggal_lahir'    => ['required', 'date', 'before:today'],
-            'no_hp'            => ['required', 'string', 'max:15'],
-            'alamat_tinggal'   => ['required', 'string'],
-            'alamat_ktp'       => ['nullable', 'string'],
-            'golongan_darah'   => ['nullable', 'in:A,B,AB,O'],
-            'agama'            => ['nullable', 'string', 'max:20'],
-            'pekerjaan'        => ['nullable', 'string', 'max:50'],
-            'status'           => ['required', 'in:Aktif,Tidak Aktif'],
+            'nik'            => ['required', 'string', 'size:16', "unique:pasien,nik,{$pasien->id}"],
+            'nama'           => ['required', 'string', 'max:100'],
+            'jenis_kelamin'  => ['required', 'in:Laki-laki,Perempuan'],
+            'tempat_lahir'   => ['nullable', 'string', 'max:100'],
+            'tanggal_lahir'  => ['required', 'date', 'before:today'],
+            'alamat'         => ['required', 'string'],
+            'nama_ortu'      => ['nullable', 'string', 'max:100'],
+            'no_telp'        => ['required', 'string', 'max:15'],
+            'poli'           => ['required', 'in:KIA,KB,MTBS'],
         ]);
 
         $pasien->update($validated);

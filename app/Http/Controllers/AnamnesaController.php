@@ -5,117 +5,122 @@ namespace App\Http\Controllers;
 use App\Models\Pasien;
 use App\Models\Anamnesa;
 use App\Models\PemeriksaanFisik;
-use App\Models\PemeriksaanLainnya;
+use App\Models\Diagnosis;
 use Illuminate\Http\Request;
 
 class AnamnesaController extends Controller
 {
+    // ─── PILIH PASIEN ─────────────────────────────────────────────────────
+
+    public function pilihPasien(Request $request)
+    {
+        $query = Pasien::query();
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('nama', 'like', "%{$search}%")
+                  ->orWhere('nik', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('poli')) {
+            $query->where('poli', $request->poli);
+        }
+
+        $pasien = $query->latest()->paginate(10)->withQueryString();
+
+        return view('pelayanan.pilih-pasien', compact('pasien'));
+    }
+
     // ─── STEP 1: Anamnesa ─────────────────────────────────────────────────────
 
     public function step1(Pasien $pasien)
     {
-        $anamnesa = $pasien->anamnesa;
+        $anamnesa = $pasien->latestAnamnesa;
         return view('anamnesa.step1', compact('pasien', 'anamnesa'));
     }
 
     public function storeStep1(Request $request, Pasien $pasien)
     {
         $validated = $request->validate([
-            'keluhan_utama'     => ['required', 'string'],
-            'riwayat_penyakit'  => ['nullable', 'string'],
-            'riwayat_keluarga'  => ['nullable', 'string'],
-            'alergi'            => ['nullable', 'string', 'max:200'],
-            'obat_saat_ini'     => ['nullable', 'string'],
-            'hari_pertama_haid' => ['nullable', 'date'],
-            'gravida'           => ['nullable', 'integer', 'min:0'],
-            'para'              => ['nullable', 'integer', 'min:0'],
-            'abortus'           => ['nullable', 'integer', 'min:0'],
+            'nama_petugas'   => ['required', 'string', 'max:100'],
+            'keluhan'        => ['required', 'string'],
+            'riwayat_pasien' => ['nullable', 'string'],
+            'status_hamil'   => ['required', 'in:0,1'],
         ], [
-            'keluhan_utama.required' => 'Keluhan utama wajib diisi.',
+            'nama_petugas.required' => 'Nama petugas wajib diisi.',
+            'keluhan.required'      => 'Keluhan wajib diisi.',
         ]);
 
-        // Upsert: buat atau perbarui data anamnesa
-        $pasien->anamnesa()->updateOrCreate(
-            ['pasien_id' => $pasien->id],
-            $validated
-        );
+        $validated['status_hamil'] = (bool) $validated['status_hamil'];
+
+        // Buat record anamnesa baru untuk kunjungan ini
+        $pasien->anamnesa()->create($validated);
 
         return redirect()->route('anamnesa.step2', $pasien)
-            ->with('success', 'Anamnesa Step 1 tersimpan.');
+            ->with('success', 'Anamnesa tersimpan.');
     }
 
     // ─── STEP 2: Pemeriksaan Fisik ────────────────────────────────────────────
 
     public function step2(Pasien $pasien)
     {
-        // Guard: step 1 harus sudah diisi
-        if (!$pasien->anamnesa) {
+        if (!$pasien->latestAnamnesa) {
             return redirect()->route('anamnesa.step1', $pasien)
                 ->with('error', 'Harap isi Anamnesa terlebih dahulu.');
         }
 
-        $pemeriksaan = $pasien->pemeriksaanFisik;
+        $pemeriksaan = $pasien->latestPemeriksaanFisik;
         return view('anamnesa.step2', compact('pasien', 'pemeriksaan'));
     }
 
     public function storeStep2(Request $request, Pasien $pasien)
     {
         $validated = $request->validate([
-            'tekanan_darah_sistolik'  => ['required', 'integer', 'min:50', 'max:300'],
-            'tekanan_darah_diastolik' => ['required', 'integer', 'min:30', 'max:200'],
-            'nadi'                    => ['required', 'integer', 'min:30', 'max:250'],
-            'suhu'                    => ['required', 'numeric', 'min:30', 'max:45'],
-            'pernapasan'              => ['required', 'integer', 'min:5', 'max:60'],
-            'berat_badan'             => ['required', 'numeric', 'min:1', 'max:300'],
-            'tinggi_badan'            => ['required', 'numeric', 'min:50', 'max:250'],
-            'lingkar_perut'           => ['nullable', 'numeric'],
-            'tinggi_fundus'           => ['nullable', 'numeric'],
-            'denyut_jantung_janin'    => ['nullable', 'integer'],
-            'presentasi_janin'        => ['nullable', 'string', 'max:50'],
-            'catatan_fisik'           => ['nullable', 'string'],
+            'kesadaran'      => ['required', 'in:Komposmentis,Somnolen,Sopor,Koma'],
+            'td_sistolik'    => ['required', 'integer', 'min:50', 'max:300'],
+            'td_diastolik'   => ['required', 'integer', 'min:30', 'max:200'],
+            'nadi'           => ['required', 'integer', 'min:30', 'max:250'],
+            'suhu'           => ['required', 'numeric', 'min:30', 'max:45'],
+            'nafas_rr'       => ['required', 'integer', 'min:5', 'max:60'],
+            'tinggi_badan'   => ['required', 'numeric', 'min:1', 'max:250'],
+            'berat_badan'    => ['required', 'numeric', 'min:0.5', 'max:300'],
+            'lingkar_lengan' => ['nullable', 'numeric'],
+            'lingkar_perut'  => ['nullable', 'numeric'],
+            'anc_terpadu'    => ['required', 'in:Belum,Sudah'],
         ]);
 
-        $pasien->pemeriksaanFisik()->updateOrCreate(
-            ['pasien_id' => $pasien->id],
-            $validated
-        );
+        $pasien->pemeriksaanFisik()->create($validated);
 
         return redirect()->route('anamnesa.step3', $pasien)
             ->with('success', 'Pemeriksaan Fisik tersimpan.');
     }
 
-    // ─── STEP 3: Pemeriksaan Lainnya ──────────────────────────────────────────
+    // ─── STEP 3: Diagnosis ────────────────────────────────────────────────────
 
     public function step3(Pasien $pasien)
     {
-        if (!$pasien->pemeriksaanFisik) {
+        if (!$pasien->latestPemeriksaanFisik) {
             return redirect()->route('anamnesa.step2', $pasien)
                 ->with('error', 'Harap isi Pemeriksaan Fisik terlebih dahulu.');
         }
 
-        $lainnya = $pasien->pemeriksaanLainnya;
-        return view('anamnesa.step3', compact('pasien', 'lainnya'));
+        $diagnosis = $pasien->latestDiagnosis;
+        return view('anamnesa.step3', compact('pasien', 'diagnosis'));
     }
 
     public function storeStep3(Request $request, Pasien $pasien)
     {
         $validated = $request->validate([
-            'hemoglobin'         => ['nullable', 'numeric', 'min:0', 'max:30'],
-            'golongan_darah_lab' => ['nullable', 'in:A,B,AB,O'],
-            'rhesus'             => ['nullable', 'in:Positif,Negatif'],
-            'gula_darah'         => ['nullable', 'numeric'],
-            'protein_urine'      => ['nullable', 'in:Negatif,+1,+2,+3,+4'],
-            'hiv_status'         => ['nullable', 'in:Non Reaktif,Reaktif,Tidak Diperiksa'],
-            'hepatitis_b'        => ['nullable', 'in:Non Reaktif,Reaktif,Tidak Diperiksa'],
-            'catatan_lainnya'    => ['nullable', 'string'],
-            'tindakan'           => ['nullable', 'string'],
-            'diagnosa'           => ['nullable', 'string'],
+            'diagnosa'   => ['required', 'string'],
+            'resep_obat' => ['nullable', 'string'],
+            'edukasi'    => ['nullable', 'string'],
+        ], [
+            'diagnosa.required' => 'Diagnosa wajib diisi.',
         ]);
 
-        $pasien->pemeriksaanLainnya()->updateOrCreate(
-            ['pasien_id' => $pasien->id],
-            $validated
-        );
+        $pasien->diagnosis()->create($validated);
 
         return redirect()->route('anamnesa.selesai', $pasien)
             ->with('success', 'Semua pemeriksaan berhasil disimpan! ✅');
@@ -125,7 +130,7 @@ class AnamnesaController extends Controller
 
     public function selesai(Pasien $pasien)
     {
-        $pasien->load(['anamnesa', 'pemeriksaanFisik', 'pemeriksaanLainnya']);
+        $pasien->load(['latestAnamnesa', 'latestPemeriksaanFisik', 'latestDiagnosis']);
         return view('anamnesa.selesai', compact('pasien'));
     }
 }

@@ -168,3 +168,59 @@ window.copyAlamatKTP = function (checkbox) {
     showToast('Alamat KTP diisi sama dengan alamat tinggal ✅');
   }
 };
+
+// ─── SMOOTH SCROLL ────────────────────────────────────────────
+document.documentElement.style.scrollBehavior = 'smooth';
+
+// ─── CARD ENTRANCE ANIMATION ──────────────────────────────────
+document.addEventListener('DOMContentLoaded', function () {
+  const cards = document.querySelectorAll('.card, .stat-card');
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    cards.forEach(function (card, i) {
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(12px)';
+      card.style.transition = 'opacity 0.4s ease ' + (i * 0.05) + 's, transform 0.4s ease ' + (i * 0.05) + 's';
+      observer.observe(card);
+    });
+  }
+
+  // ─── KEYBOARD SHORTCUT: Ctrl+K for search ──────────────────
+  document.addEventListener('keydown', function (e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+      e.preventDefault();
+      var searchInput = document.querySelector('.search-input');
+      if (searchInput) searchInput.focus();
+    }
+  });
+
+  // ─── NOTIFICATION BADGE AUTO-UPDATE ────────────────────────
+  function updateNotifBadge() {
+    var badge = document.getElementById('notifBadge');
+    if (!badge) return;
+    fetch('/notifications/count', {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.count > 0) {
+        badge.style.display = 'block';
+        badge.textContent = data.count > 9 ? '9+' : data.count;
+      } else {
+        badge.style.display = 'none';
+      }
+    })
+    .catch(function() {});
+  }
+  updateNotifBadge();
+  setInterval(updateNotifBadge, 60000); // Update every 60s
+});

@@ -11,18 +11,17 @@ return new class extends Migration
         Schema::create('pasien', function (Blueprint $table) {
             $table->id();
             $table->string('nik', 16)->unique()->comment('Nomor Induk Kependudukan');
+            $table->unsignedInteger('no_urut')->comment('Urutan pendaftaran per hari');
             $table->string('nama', 100);
             $table->enum('jenis_kelamin', ['Laki-laki', 'Perempuan']);
+            $table->string('tempat_lahir', 100)->nullable();
             $table->date('tanggal_lahir');
-            $table->string('no_hp', 15);
-            $table->text('alamat_tinggal');
-            $table->text('alamat_ktp')->nullable();
-            $table->enum('golongan_darah', ['A', 'B', 'AB', 'O'])->nullable();
-            $table->string('agama', 20)->nullable();
-            $table->string('pekerjaan', 50)->nullable();
-            $table->enum('status', ['Aktif', 'Tidak Aktif'])->default('Aktif');
+            $table->text('alamat');
+            $table->string('nama_ortu', 100)->nullable()->comment('Nama orang tua kandung');
+            $table->string('no_telp', 15);
+            $table->enum('poli', ['KIA', 'KB', 'MTBS'])->default('KIA')->comment('Poli tujuan');
             $table->timestamps();
-            $table->softDeletes(); // Soft delete untuk keamanan data medis
+            $table->softDeletes();
         });
     }
 

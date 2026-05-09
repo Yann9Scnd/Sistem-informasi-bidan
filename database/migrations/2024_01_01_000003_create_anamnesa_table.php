@@ -11,16 +11,10 @@ return new class extends Migration
         Schema::create('anamnesa', function (Blueprint $table) {
             $table->id();
             $table->foreignId('pasien_id')->constrained('pasien')->cascadeOnDelete();
-            $table->text('keluhan_utama');
-            $table->text('riwayat_penyakit')->nullable();
-            $table->text('riwayat_keluarga')->nullable();
-            $table->string('alergi', 200)->nullable();
-            $table->text('obat_saat_ini')->nullable();
-            // Data kebidanan
-            $table->date('hari_pertama_haid')->nullable()->comment('HPHT');
-            $table->unsignedTinyInteger('gravida')->nullable()->comment('Jumlah kehamilan');
-            $table->unsignedTinyInteger('para')->nullable()->comment('Jumlah persalinan');
-            $table->unsignedTinyInteger('abortus')->nullable()->comment('Jumlah keguguran');
+            $table->string('nama_petugas', 100)->comment('Nama bidan/petugas pemeriksa');
+            $table->text('keluhan');
+            $table->text('riwayat_pasien')->nullable()->comment('Status riwayat penyakit pasien');
+            $table->boolean('status_hamil')->default(false)->comment('Status kehamilan');
             $table->timestamps();
         });
     }

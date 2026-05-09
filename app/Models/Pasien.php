@@ -4,26 +4,26 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
 class Pasien extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'pasien';
 
     protected $fillable = [
         'nik',
+        'no_urut',
         'nama',
         'jenis_kelamin',
+        'tempat_lahir',
         'tanggal_lahir',
-        'no_hp',
-        'alamat_tinggal',
-        'alamat_ktp',
-        'golongan_darah',
-        'agama',
-        'pekerjaan',
-        'status',
+        'alamat',
+        'nama_ortu',
+        'no_telp',
+        'poli',
     ];
 
     protected $casts = [
@@ -34,17 +34,32 @@ class Pasien extends Model
 
     public function anamnesa()
     {
-        return $this->hasOne(Anamnesa::class);
+        return $this->hasMany(Anamnesa::class);
+    }
+
+    public function latestAnamnesa()
+    {
+        return $this->hasOne(Anamnesa::class)->latestOfMany();
     }
 
     public function pemeriksaanFisik()
     {
-        return $this->hasOne(PemeriksaanFisik::class);
+        return $this->hasMany(PemeriksaanFisik::class);
     }
 
-    public function pemeriksaanLainnya()
+    public function latestPemeriksaanFisik()
     {
-        return $this->hasOne(PemeriksaanLainnya::class);
+        return $this->hasOne(PemeriksaanFisik::class)->latestOfMany();
+    }
+
+    public function diagnosis()
+    {
+        return $this->hasMany(Diagnosis::class);
+    }
+
+    public function latestDiagnosis()
+    {
+        return $this->hasOne(Diagnosis::class)->latestOfMany();
     }
 
     // ─── Accessors ────────────────────────────────────────────────────────────
@@ -85,5 +100,24 @@ class Pasien extends Model
         return $this->tanggal_lahir->day . ' '
             . $months[$this->tanggal_lahir->month] . ' '
             . $this->tanggal_lahir->year;
+    }
+
+    /**
+     * Tempat, Tanggal Lahir format.
+     */
+    public function getTtlAttribute(): string
+    {
+        $tempat = $this->tempat_lahir ?: '-';
+        return $tempat . ', ' . $this->tanggal_lahir_format;
+    }
+
+    /**
+     * Generate nomor urut otomatis per hari.
+     */
+    public static function generateNoUrut(): int
+    {
+        $today = Carbon::today();
+        $lastUrut = static::whereDate('created_at', $today)->max('no_urut');
+        return ($lastUrut ?? 0) + 1;
     }
 }

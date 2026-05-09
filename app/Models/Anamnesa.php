@@ -13,19 +13,14 @@ class Anamnesa extends Model
 
     protected $fillable = [
         'pasien_id',
-        'keluhan_utama',
-        'riwayat_penyakit',
-        'riwayat_keluarga',
-        'alergi',
-        'obat_saat_ini',
-        'hari_pertama_haid',
-        'gravida',
-        'para',
-        'abortus',
+        'nama_petugas',
+        'keluhan',
+        'riwayat_pasien',
+        'status_hamil',
     ];
 
     protected $casts = [
-        'hari_pertama_haid' => 'date',
+        'status_hamil' => 'boolean',
     ];
 
     public function pasien()

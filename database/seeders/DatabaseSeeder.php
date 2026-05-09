@@ -17,11 +17,11 @@ class DatabaseSeeder extends Seeder
         User::create([
             'name'     => 'Bidan Siti',
             'email'    => 'bidan@klinik.com',
-            'password' => Hash::make('password123'), // Ini akan di-encrypt
-            'role'     => 'bidan', // Sesuai enum role yang Anda buat
+            'password' => Hash::make('password123'),
+            'role'     => 'bidan',
         ]);
 
-        // Opsional: Buat akun Admin
+        // Akun Admin
         User::create([
             'name'     => 'Admin Sistem',
             'email'    => 'admin@klinik.com',

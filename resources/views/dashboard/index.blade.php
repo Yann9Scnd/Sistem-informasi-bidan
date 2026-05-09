@@ -12,7 +12,7 @@
   <p>Selamat datang, <strong>{{ auth()->user()->name }}</strong> 👋 — {{ now()->isoFormat('dddd, D MMMM Y') }}</p>
 </div>
 
-{{-- ===== STAT CARDS ===== --}}
+{{-- STAT CARDS --}}
 <div class="stats-grid">
   <div class="stat-card">
     <div class="stat-icon pink">🤰</div>
@@ -23,41 +23,38 @@
     </div>
   </div>
   <div class="stat-card">
-    <div class="stat-icon green">👶</div>
+    <div class="stat-icon green">🏥</div>
     <div>
-      <div class="stat-label">Pasien Aktif</div>
-      <div class="stat-value">{{ $stats['pasien_aktif'] }}</div>
-      <div class="stat-sub">Status aktif</div>
+      <div class="stat-label">Poli KIA</div>
+      <div class="stat-value">{{ $stats['poli_kia'] }}</div>
+      <div class="stat-sub">Kesehatan Ibu & Anak</div>
     </div>
   </div>
   <div class="stat-card">
-    <div class="stat-icon blue">📅</div>
+    <div class="stat-icon blue">💊</div>
     <div>
-      <div class="stat-label">Bulan Ini</div>
-      <div class="stat-value">{{ $stats['pasien_bulan_ini'] }}</div>
-      <div class="stat-sub">Pasien terdaftar</div>
+      <div class="stat-label">Poli KB</div>
+      <div class="stat-value">{{ $stats['poli_kb'] }}</div>
+      <div class="stat-sub">Keluarga Berencana</div>
     </div>
   </div>
   <div class="stat-card">
-    <div class="stat-icon orange">🩺</div>
+    <div class="stat-icon orange">👶</div>
     <div>
-      <div class="stat-label">Hari Ini</div>
-      <div class="stat-value">{{ $stats['pasien_baru_hari_ini'] }}</div>
-      <div class="stat-sub">Pasien baru</div>
+      <div class="stat-label">MTBS</div>
+      <div class="stat-value">{{ $stats['poli_mtbs'] }}</div>
+      <div class="stat-sub">Balita Sakit 0-6 th</div>
     </div>
   </div>
 </div>
 
-{{-- ===== CONTENT ROW ===== --}}
+{{-- CONTENT ROW --}}
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
 
   {{-- Pasien Terbaru --}}
   <div class="card">
     <div class="card-header">
-      <div class="card-title">
-        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-        Pasien Terbaru
-      </div>
+      <div class="card-title">👤 Pasien Terbaru</div>
       <a href="{{ route('pasien.index') }}" style="font-size:12px;color:var(--pink-accent);font-weight:600">Lihat Semua →</a>
     </div>
     <div class="card-body" style="padding:0">
@@ -70,13 +67,12 @@
             <div style="font-weight:600;font-size:13px;color:var(--text-dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ $p->nama }}</div>
             <div style="font-size:11px;color:var(--text-light)">{{ $p->nik }} · {{ $p->umur }}</div>
           </div>
-          <span class="badge {{ $p->status === 'Aktif' ? 'badge-green' : 'badge-gray' }}">
-            {{ $p->status }}
+          <span class="badge {{ $p->poli === 'KIA' ? 'badge-green' : ($p->poli === 'KB' ? 'badge-purple' : 'badge-orange') }}">
+            {{ $p->poli }}
           </span>
         </div>
       @empty
         <div class="no-data" style="padding:40px">
-          <svg width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
           <h3>Belum ada pasien</h3>
           <p>Tambahkan pasien baru untuk memulai</p>
         </div>
@@ -91,80 +87,74 @@
     </div>
     <div class="card-body">
       <div style="display:flex;flex-direction:column;gap:12px">
-        <a href="{{ route('pasien.create') }}"
-           style="display:flex;align-items:center;gap:14px;padding:16px;border-radius:12px;background:var(--pink-secondary);border:1.5px solid var(--pink-primary);text-decoration:none;transition:all 0.2s"
-           onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+        <a href="{{ route('pasien.create') }}" class="quick-action-link" style="background:var(--pink-secondary);border:1.5px solid var(--pink-primary)">
           <span style="font-size:28px">➕</span>
           <div>
             <div style="font-weight:600;font-size:14px;color:var(--text-dark)">Daftarkan Pasien Baru</div>
             <div style="font-size:12px;color:var(--text-light)">Tambah data pasien ke sistem</div>
           </div>
         </a>
-        <a href="{{ route('pasien.index') }}"
-           style="display:flex;align-items:center;gap:14px;padding:16px;border-radius:12px;background:#F0FFF4;border:1.5px solid #C6F6D5;text-decoration:none;transition:all 0.2s"
-           onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
-          <span style="font-size:28px">📋</span>
+        <a href="{{ route('pelayanan.pilih-pasien') }}" class="quick-action-link" style="background:#F0FFF4;border:1.5px solid #C6F6D5">
+          <span style="font-size:28px">🩺</span>
           <div>
-            <div style="font-weight:600;font-size:14px;color:var(--text-dark)">Data Pasien Terdaftar</div>
-            <div style="font-size:12px;color:var(--text-light)">Kelola seluruh data pasien</div>
+            <div style="font-weight:600;font-size:14px;color:var(--text-dark)">Mulai Pemeriksaan</div>
+            <div style="font-size:12px;color:var(--text-light)">Pilih pasien & mulai anamnese</div>
           </div>
         </a>
-        <div style="display:flex;align-items:center;gap:14px;padding:16px;border-radius:12px;background:#EBF8FF;border:1.5px solid #BEE3F8;cursor:pointer;transition:all 0.2s"
-             onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+        <a href="{{ route('pemeriksaan.index') }}" class="quick-action-link" style="background:#EBF8FF;border:1.5px solid #BEE3F8">
           <span style="font-size:28px">📝</span>
           <div>
-            <div style="font-weight:600;font-size:14px;color:var(--text-dark)">Input Anamnesa</div>
-            <div style="font-size:12px;color:var(--text-light)">Mulai pemeriksaan pasien</div>
+            <div style="font-weight:600;font-size:14px;color:var(--text-dark)">Data Pemeriksaan</div>
+            <div style="font-size:12px;color:var(--text-light)">{{ $stats['pemeriksaan_hari_ini'] }} pemeriksaan hari ini</div>
           </div>
-        </div>
+        </a>
+        <a href="{{ url('/portal') }}" class="quick-action-link" style="background:#FAF5FF;border:1.5px solid #E9D5FF" target="_blank">
+          <span style="font-size:28px">🔗</span>
+          <div>
+            <div style="font-weight:600;font-size:14px;color:var(--text-dark)">Portal Pasien</div>
+            <div style="font-size:12px;color:var(--text-light)">Link untuk pasien cek hasil</div>
+          </div>
+        </a>
       </div>
     </div>
   </div>
 
 </div>
 
-{{-- ===== PELAYANAN ===== --}}
+{{-- PELAYANAN --}}
 <div class="card" style="margin-top:20px">
   <div class="card-header">
-    <div class="card-title">
-      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-      Jenis Pelayanan
-    </div>
+    <div class="card-title">🏥 Pelayanan Klinik</div>
   </div>
   <div class="card-body">
     <div class="pelayanan-grid">
-      <div class="pelayanan-card" onclick="showToast('Membuka pelayanan ANC...')">
+      <a href="{{ route('pasien.index', ['poli' => 'KIA']) }}" class="pelayanan-card" style="text-decoration:none">
         <div class="pelayanan-icon">🤰</div>
-        <div class="pelayanan-title">ANC (Antenatal Care)</div>
-        <div class="pelayanan-desc">Pemeriksaan kehamilan rutin</div>
-      </div>
-      <div class="pelayanan-card" onclick="showToast('Membuka pelayanan KB...')">
+        <div class="pelayanan-title">Poli KIA</div>
+        <div class="pelayanan-desc">Kesehatan Ibu & Anak</div>
+      </a>
+      <a href="{{ route('pasien.index', ['poli' => 'KB']) }}" class="pelayanan-card" style="text-decoration:none">
         <div class="pelayanan-icon">💊</div>
-        <div class="pelayanan-title">Pelayanan KB</div>
-        <div class="pelayanan-desc">Keluarga berencana</div>
-      </div>
-      <div class="pelayanan-card" onclick="showToast('Membuka pelayanan imunisasi...')">
-        <div class="pelayanan-icon">💉</div>
-        <div class="pelayanan-title">Imunisasi</div>
-        <div class="pelayanan-desc">Vaksinasi bayi & balita</div>
-      </div>
-      <div class="pelayanan-card" onclick="showToast('Membuka pelayanan nifas...')">
+        <div class="pelayanan-title">Poli KB</div>
+        <div class="pelayanan-desc">Keluarga Berencana</div>
+      </a>
+      <a href="{{ route('pasien.index', ['poli' => 'MTBS']) }}" class="pelayanan-card" style="text-decoration:none">
         <div class="pelayanan-icon">👶</div>
-        <div class="pelayanan-title">Perawatan Nifas</div>
-        <div class="pelayanan-desc">Pasca melahirkan</div>
-      </div>
-      <div class="pelayanan-card" onclick="showToast('Membuka persalinan...')">
-        <div class="pelayanan-icon">🏥</div>
-        <div class="pelayanan-title">Persalinan</div>
-        <div class="pelayanan-desc">Bantuan proses kelahiran</div>
-      </div>
-      <div class="pelayanan-card" onclick="showToast('Membuka pemeriksaan umum...')">
-        <div class="pelayanan-icon">🩺</div>
-        <div class="pelayanan-title">Pemeriksaan Umum</div>
-        <div class="pelayanan-desc">Konsultasi kesehatan</div>
-      </div>
+        <div class="pelayanan-title">MTBS</div>
+        <div class="pelayanan-desc">Balita Sakit 0-6 tahun</div>
+      </a>
     </div>
   </div>
 </div>
 
 @endsection
+
+@push('styles')
+<style>
+.quick-action-link {
+  display:flex;align-items:center;gap:14px;padding:16px;border-radius:12px;
+  text-decoration:none;transition:all 0.2s;
+}
+.quick-action-link:hover { transform:translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+</style>
+@endpush

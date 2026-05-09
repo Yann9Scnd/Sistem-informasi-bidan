@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="csrf-token" content="{{ csrf_token() }}">
-<title>@yield('title', 'Dashboard') — PMB Bidan Klinik</title>
+<title>@yield('title', 'Dashboard') — PMB Sri Andayani, Amd.Keb</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 @stack('styles')
@@ -19,16 +19,16 @@
     <div class="navbar-brand">
       <div class="nav-logo">🏥</div>
       <div>
-        <div class="nav-title">PMB Bidan Klinik</div>
-        <div class="nav-subtitle">Sistem Manajemen Pasien</div>
+        <div class="nav-title">PMB Sri Andayani</div>
+        <div class="nav-subtitle">Amd.Keb</div>
       </div>
     </div>
   </div>
   <div class="navbar-right">
-    <button class="notif-btn" title="Notifikasi">
-      <div class="notif-badge"></div>
+    <a href="{{ route('notifications.index') }}" class="notif-btn" title="Notifikasi" id="notifBtn">
+      <div class="notif-badge" id="notifBadge" style="display:none"></div>
       <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-    </button>
+    </a>
     <div class="user-dropdown">
       <button class="user-avatar" id="avatarBtn">
         {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
@@ -38,7 +38,7 @@
           <div class="d-name">{{ auth()->user()->name }}</div>
           <div class="d-role">{{ ucfirst(auth()->user()->role ?? 'Bidan') }}</div>
         </div>
-        <a href="#" class="dropdown-item">
+        <a href="{{ route('profile.show') }}" class="dropdown-item">
           <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
           Profil Saya
         </a>
@@ -66,33 +66,31 @@
       </a>
     </div>
     <div class="sidebar-section">
-      <div class="sidebar-section-title">Data Pasien</div>
+      <div class="sidebar-section-title">Pendaftaran</div>
       <a href="{{ route('pasien.create') }}" class="nav-item {{ request()->routeIs('pasien.create') ? 'active' : '' }}">
         <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
-        Data Pasien Baru
+        Pasien Baru
         <span class="nav-badge">+</span>
       </a>
-      <a href="{{ route('pasien.index') }}" class="nav-item {{ request()->routeIs('pasien.index') ? 'active' : '' }}">
+      <a href="{{ route('pasien.index') }}" class="nav-item {{ request()->routeIs('pasien.index','pasien.show','pasien.edit') ? 'active' : '' }}">
         <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-        Data Pasien Terdaftar
+        Pasien Terdaftar
       </a>
     </div>
     <div class="sidebar-section">
       <div class="sidebar-section-title">Pelayanan</div>
-      <a href="#" class="nav-item">
-        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-        Pelayanan
-      </a>
-      <button class="nav-item {{ request()->routeIs('anamnesa.*') ? 'active' : '' }}" onclick="toggleAnamnesa(this)" type="button">
+      <button class="nav-item {{ request()->routeIs('anamnesa.*','pelayanan.*') ? 'active' : '' }}" onclick="toggleAnamnesa(this)" type="button">
         <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-        Anamnesa
+        Anamnese
         <svg id="anamnesa-arrow" class="chevron" style="margin-left:auto" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
       </button>
-      <div class="nav-submenu {{ request()->routeIs('anamnesa.*') ? 'open' : '' }}" id="anamnesa-menu">
-        <a href="#" class="nav-subitem"><svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/></svg>Anamnesa</a>
-        <a href="#" class="nav-subitem"><svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/></svg>Pemeriksaan Fisik</a>
-        <a href="#" class="nav-subitem"><svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/></svg>Lainnya</a>
+      <div class="nav-submenu {{ request()->routeIs('anamnesa.*','pelayanan.*') ? 'open' : '' }}" id="anamnesa-menu">
+        <a href="{{ route('pelayanan.pilih-pasien') }}" class="nav-subitem {{ request()->routeIs('pelayanan.pilih-pasien') ? 'active' : '' }}"><svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/></svg>Pilih Pasien</a>
       </div>
+      <a href="{{ route('pemeriksaan.index') }}" class="nav-item {{ request()->routeIs('pemeriksaan.*') ? 'active' : '' }}">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        Data Pemeriksaan
+      </a>
     </div>
     <div class="sidebar-section" style="margin-top:16px">
       <form method="POST" action="{{ route('logout') }}">
@@ -107,6 +105,10 @@
 
   <main class="main-content">
     @yield('content')
+
+    <footer class="app-footer">
+      <p>&copy; {{ date('Y') }} PMB Sri Andayani, Amd.Keb — Sistem Informasi Klinik Bidan</p>
+    </footer>
   </main>
 </div>
 

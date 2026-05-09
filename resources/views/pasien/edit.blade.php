@@ -1,19 +1,20 @@
 @extends('layouts.app')
 
-@section('title', 'Data Pasien Baru')
+@section('title', 'Edit Pasien')
 
 @section('content')
 
 <div class="page-header">
   <h1>
-    <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
-    Pendaftaran Pasien Baru
+    <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+    Edit Data Pasien
   </h1>
-  <p>Tambahkan data pasien baru ke sistem klinik</p>
+  <p>Perbarui data pasien: {{ $pasien->nama }}</p>
 </div>
 
-<form action="{{ route('pasien.store') }}" method="POST" id="pasienForm">
+<form action="{{ route('pasien.update', $pasien) }}" method="POST">
 @csrf
+@method('PUT')
 
 <div class="card">
   <div class="card-header">
@@ -24,7 +25,6 @@
   </div>
   <div class="card-body">
 
-    {{-- Validation errors --}}
     @if ($errors->any())
       <div class="alert-error">
         <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 8v4m0 4h.01" stroke-linecap="round" stroke-width="2"/></svg>
@@ -49,14 +49,13 @@
         <label class="form-label">NIK <span class="required">*</span></label>
         <input type="text" name="nik" class="form-control @error('nik') is-invalid @enderror"
           placeholder="Masukkan NIK (16 digit)" maxlength="16"
-          value="{{ old('nik') }}" required>
+          value="{{ old('nik', $pasien->nik) }}" required>
         @error('nik')<span class="invalid-feedback">{{ $message }}</span>@enderror
       </div>
       <div class="form-group">
         <label class="form-label">No. Urut Pendaftaran</label>
-        <input type="text" class="form-control" value="{{ str_pad($noUrut, 3, '0', STR_PAD_LEFT) }}" readonly
+        <input type="text" class="form-control" value="{{ str_pad($pasien->no_urut, 3, '0', STR_PAD_LEFT) }}" readonly
           style="background:#f0f0f0;font-weight:600;color:var(--pink-accent)">
-        <small style="color:var(--text-light);font-size:11px">Otomatis per hari</small>
       </div>
     </div>
 
@@ -70,22 +69,21 @@
         <label class="form-label">Nama Lengkap <span class="required">*</span></label>
         <input type="text" name="nama" class="form-control @error('nama') is-invalid @enderror"
           placeholder="Masukkan nama lengkap"
-          value="{{ old('nama') }}" required>
+          value="{{ old('nama', $pasien->nama) }}" required>
         @error('nama')<span class="invalid-feedback">{{ $message }}</span>@enderror
       </div>
       <div class="form-group">
         <label class="form-label">Jenis Kelamin <span class="required">*</span></label>
         <div class="radio-group" style="padding:10px 0">
           <label class="radio-option">
-            <input type="radio" name="jenis_kelamin" value="Laki-laki" {{ old('jenis_kelamin') === 'Laki-laki' ? 'checked' : '' }}>
+            <input type="radio" name="jenis_kelamin" value="Laki-laki" {{ old('jenis_kelamin', $pasien->jenis_kelamin) === 'Laki-laki' ? 'checked' : '' }}>
             Laki-laki
           </label>
           <label class="radio-option">
-            <input type="radio" name="jenis_kelamin" value="Perempuan" {{ old('jenis_kelamin', 'Perempuan') === 'Perempuan' ? 'checked' : '' }}>
+            <input type="radio" name="jenis_kelamin" value="Perempuan" {{ old('jenis_kelamin', $pasien->jenis_kelamin) === 'Perempuan' ? 'checked' : '' }}>
             Perempuan
           </label>
         </div>
-        @error('jenis_kelamin')<span class="invalid-feedback">{{ $message }}</span>@enderror
       </div>
     </div>
 
@@ -93,12 +91,12 @@
       <div class="form-group">
         <label class="form-label">Tempat Lahir</label>
         <input type="text" name="tempat_lahir" class="form-control"
-          placeholder="Kota/Kabupaten" value="{{ old('tempat_lahir') }}">
+          placeholder="Kota/Kabupaten" value="{{ old('tempat_lahir', $pasien->tempat_lahir) }}">
       </div>
       <div class="form-group">
         <label class="form-label">Tanggal Lahir <span class="required">*</span></label>
         <input type="date" name="tanggal_lahir" class="form-control @error('tanggal_lahir') is-invalid @enderror"
-          value="{{ old('tanggal_lahir') }}" required>
+          value="{{ old('tanggal_lahir', $pasien->tanggal_lahir?->format('Y-m-d')) }}" required>
         @error('tanggal_lahir')<span class="invalid-feedback">{{ $message }}</span>@enderror
       </div>
     </div>
@@ -108,7 +106,7 @@
         <label class="form-label">Alamat Lengkap <span class="required">*</span></label>
         <textarea name="alamat" class="form-control @error('alamat') is-invalid @enderror"
           rows="3" placeholder="Jl. Contoh No.1, RT/RW, Kelurahan, Kecamatan, Kota"
-          required>{{ old('alamat') }}</textarea>
+          required>{{ old('alamat', $pasien->alamat) }}</textarea>
         @error('alamat')<span class="invalid-feedback">{{ $message }}</span>@enderror
       </div>
     </div>
@@ -117,12 +115,12 @@
       <div class="form-group">
         <label class="form-label">Nama Orang Tua Kandung</label>
         <input type="text" name="nama_ortu" class="form-control"
-          placeholder="Nama ayah/ibu kandung" value="{{ old('nama_ortu') }}">
+          placeholder="Nama ayah/ibu kandung" value="{{ old('nama_ortu', $pasien->nama_ortu) }}">
       </div>
       <div class="form-group">
         <label class="form-label">No. Telepon <span class="required">*</span></label>
         <input type="text" name="no_telp" class="form-control @error('no_telp') is-invalid @enderror"
-          placeholder="Contoh: 081234567890" value="{{ old('no_telp') }}" required>
+          placeholder="Contoh: 081234567890" value="{{ old('no_telp', $pasien->no_telp) }}" required>
         @error('no_telp')<span class="invalid-feedback">{{ $message }}</span>@enderror
       </div>
     </div>
@@ -137,9 +135,9 @@
         <label class="form-label">Poli <span class="required">*</span></label>
         <select name="poli" class="form-control @error('poli') is-invalid @enderror" required>
           <option value="">-- Pilih Poli --</option>
-          <option value="KIA" {{ old('poli') === 'KIA' ? 'selected' : '' }}>KIA (Kesehatan Ibu & Anak)</option>
-          <option value="KB" {{ old('poli') === 'KB' ? 'selected' : '' }}>KB (Keluarga Berencana)</option>
-          <option value="MTBS" {{ old('poli') === 'MTBS' ? 'selected' : '' }}>MTBS (Balita Sakit 0-6 th)</option>
+          <option value="KIA" {{ old('poli', $pasien->poli) === 'KIA' ? 'selected' : '' }}>KIA (Kesehatan Ibu & Anak)</option>
+          <option value="KB" {{ old('poli', $pasien->poli) === 'KB' ? 'selected' : '' }}>KB (Keluarga Berencana)</option>
+          <option value="MTBS" {{ old('poli', $pasien->poli) === 'MTBS' ? 'selected' : '' }}>MTBS (Balita Sakit 0-6 th)</option>
         </select>
         @error('poli')<span class="invalid-feedback">{{ $message }}</span>@enderror
       </div>
@@ -150,10 +148,10 @@
         <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
         Kembali
       </a>
-      <button type="submit" class="btn btn-green btn-loading-on-submit" id="submitPasienBtn">
+      <button type="submit" class="btn btn-green btn-loading-on-submit">
         <span class="btn-text">
           <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-          Simpan Data Pasien
+          Simpan Perubahan
         </span>
         <div class="spinner"></div>
       </button>

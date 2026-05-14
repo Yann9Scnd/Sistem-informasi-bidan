@@ -29,7 +29,7 @@
       <div class="alert-error">
         <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 8v4m0 4h.01" stroke-linecap="round" stroke-width="2"/></svg>
         <div>
-          <strong>Terdapat kesalahan input:</strong>
+          <strong>Terdapat kesalahan input!:</strong>
           <ul style="margin-top:4px;padding-left:16px">
             @foreach($errors->all() as $error)
               <li>{{ $error }}</li>
